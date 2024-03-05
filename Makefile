@@ -1,8 +1,8 @@
 # Variables
 BINARY_NAME := hash
 BUILD_DIR := build
-GIT_COMMIT := $(shell git rev-parse HEAD)
-LDFLAGS := -ldflags="-X main.version=$(GIT_COMMIT)"
+VERSION := v1.0.0
+LDFLAGS := -ldflags="-X main.version=$(VERSION)"
 
 .PHONY: all
 all: test format build
