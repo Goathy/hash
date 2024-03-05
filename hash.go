@@ -99,8 +99,8 @@ Flags:
 		file, err := os.Open(filePath)
 
 		if err != nil {
-			fmt.Fprint(stdErr, err)
-			return 1
+			f.Usage()
+			return 2
 		}
 
 		defer file.Close()

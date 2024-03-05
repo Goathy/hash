@@ -5,6 +5,18 @@ import (
 	"testing"
 )
 
+var helpMsg = `hash program usage:
+
+hash [FLAGS] -a SHA1 [STDIN]
+hash [FLAGS] -a SHA1 -- [STDIN]
+hash [FLAGS] -a SHA1 [FILE]
+
+Flags:
+-a, -algorithm one of {MD5 SHA1 SHA224 SHA256 SHA384 SHA512}
+-h, -help print help
+-v, -version current version
+`
+
 func TestHash(t *testing.T) {
 	t.Run("unsupported hashing algorithm", func(t *testing.T) {
 		var (
@@ -22,17 +34,6 @@ func TestHash(t *testing.T) {
 	})
 
 	t.Run("help", func(t *testing.T) {
-		helpMsg := `hash program usage:
-
-hash [FLAGS] -a SHA1 [STDIN]
-hash [FLAGS] -a SHA1 -- [STDIN]
-hash [FLAGS] -a SHA1 [FILE]
-
-Flags:
--a, -algorithm one of {MD5 SHA1 SHA224 SHA256 SHA384 SHA512}
--h, -help print help
--v, -version current version
-`
 		t.Run("-h", func(t *testing.T) {
 			var (
 				args = []string{"hash", "-h"}
@@ -62,22 +63,6 @@ Flags:
 			assertEqual(t, out.String(), "")
 			assertEqual(t, err.String(), helpMsg)
 		})
-
-		t.Run("incomplite flag", func(t *testing.T) {
-			var (
-				args = []string{"hash", "-"}
-				in   = bytes.NewReader([]byte(""))
-				out  = new(bytes.Buffer)
-				err  = new(bytes.Buffer)
-			)
-
-			exitCode := run(args, in, out, err)
-
-			assertEqual(t, exitCode, 2)
-			assertEqual(t, out.String(), "")
-			assertEqual(t, err.String(), helpMsg)
-		})
-
 	})
 
 	t.Run("hashing from stdin", func(t *testing.T) {
@@ -294,6 +279,36 @@ Flags:
 			assertEqual(t, out.String(), "hash version: test-version\n")
 			assertEqual(t, err.String(), "")
 		})
+	})
+
+	t.Run("incomplite flag", func(t *testing.T) {
+		var (
+			args = []string{"hash", "-"}
+			in   = bytes.NewReader([]byte(""))
+			out  = new(bytes.Buffer)
+			err  = new(bytes.Buffer)
+		)
+
+		exitCode := run(args, in, out, err)
+
+		assertEqual(t, exitCode, 2)
+		assertEqual(t, out.String(), "")
+		assertEqual(t, err.String(), helpMsg)
+	})
+
+	t.Run("missing file", func(t *testing.T) {
+		var (
+			args = []string{"hash", "-a", "md5", "./fixtures/missing.md"}
+			in   = bytes.NewReader(nil)
+			out  = new(bytes.Buffer)
+			err  = new(bytes.Buffer)
+		)
+
+		exitCode := run(args, in, out, err)
+
+		assertEqual(t, exitCode, 2)
+		assertEqual(t, out.String(), "")
+		assertEqual(t, err.String(), helpMsg)
 	})
 }
 

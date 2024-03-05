@@ -1,7 +1,7 @@
 # Variables
 BINARY_NAME := hash
 BUILD_DIR := build
-VERSION := v1.0.1
+VERSION := v1.0.2
 LDFLAGS := -ldflags="-X main.version=$(VERSION)"
 
 .PHONY: all
