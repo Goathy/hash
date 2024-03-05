@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 	"strings"
@@ -18,19 +19,11 @@ func main() {
 	os.Exit(exitCode)
 }
 
-var availableAlgorthms = map[string]bool{
-	"MD5":    true,
-	"SHA1":   true,
-	"SHA224": true,
-	"SHA256": true,
-	"SHA384": true,
-	"SHA512": true,
-}
-
 func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int {
 	var (
-		algo string
-		help bool
+		algo   string
+		help   bool
+		hasher hash.Hash
 	)
 
 	f := flag.NewFlagSet("hash", flag.ExitOnError)
@@ -57,68 +50,31 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 		algo = strings.ToUpper(algo)
 	}
 
-	if _, exists := availableAlgorthms[algo]; exists == false {
+	switch algo {
+	case "MD5":
+		hasher = md5.New()
+	case "SHA1":
+		hasher = sha1.New()
+	case "SHA224":
+		hasher = sha256.New224()
+	case "SHA256":
+		hasher = sha256.New()
+	case "SHA384":
+		hasher = sha512.New384()
+	case "SHA512":
+		hasher = sha512.New()
+	default:
 		fmt.Fprintf(stdErr, "Unsupported hashing algorithm\n")
 		return 1
 	}
 
-	switch algo {
-	case "MD5":
-		hasher := md5.New()
-		if _, err := io.Copy(hasher, stdIn); err != nil {
-			fmt.Fprint(stdErr, err)
-			return 1
-		}
-		sum := hex.EncodeToString(hasher.Sum(nil))
-		fmt.Fprintln(stdOut, sum)
-	case "SHA1":
-		hasher := sha1.New()
-		if _, err := io.Copy(hasher, stdIn); err != nil {
-			fmt.Fprint(stdErr, err)
-			return 1
-		}
-		sum := hex.EncodeToString(hasher.Sum(nil))
-		fmt.Fprintln(stdOut, sum)
-
-	case "SHA224":
-		hasher := sha256.New224()
-		if _, err := io.Copy(hasher, stdIn); err != nil {
-			fmt.Fprint(stdErr, err)
-			return 1
-		}
-		sum := hex.EncodeToString(hasher.Sum(nil))
-		fmt.Fprintln(stdOut, sum)
-
-	case "SHA256":
-		hasher := sha256.New()
-		if _, err := io.Copy(hasher, stdIn); err != nil {
-			fmt.Fprint(stdErr, err)
-			return 1
-		}
-		sum := hex.EncodeToString(hasher.Sum(nil))
-		fmt.Fprintln(stdOut, sum)
-
-	case "SHA384":
-		hasher := sha512.New384()
-		if _, err := io.Copy(hasher, stdIn); err != nil {
-			fmt.Fprint(stdErr, err)
-			return 1
-		}
-		sum := hex.EncodeToString(hasher.Sum(nil))
-		fmt.Fprintln(stdOut, sum)
-
-	case "SHA512":
-		hasher := sha512.New()
-		if _, err := io.Copy(hasher, stdIn); err != nil {
-			fmt.Fprint(stdErr, err)
-			return 1
-		}
-		sum := hex.EncodeToString(hasher.Sum(nil))
-		fmt.Fprintln(stdOut, sum)
-	default:
-		return 3
-
+	if _, err := io.Copy(hasher, stdIn); err != nil {
+		fmt.Fprint(stdErr, err)
+		return 1
 	}
+	sum := hex.EncodeToString(hasher.Sum(nil))
+	fmt.Fprintln(stdOut, sum)
+
 	return 0
 }
 
