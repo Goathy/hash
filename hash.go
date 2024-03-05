@@ -19,6 +19,11 @@ func main() {
 	os.Exit(exitCode)
 }
 
+const (
+	DoubleDash  = "--"
+	EmptyString = ""
+)
+
 func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int {
 	var (
 		algo   string
@@ -73,7 +78,7 @@ Flags:
 		return 1
 	}
 
-	if filePath := f.Arg(0); filePath != "" && filePath != "--" {
+	if filePath := f.Arg(0); filePath != EmptyString && filePath != DoubleDash {
 		file, err := os.Open(filePath)
 
 		if err != nil {
