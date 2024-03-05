@@ -24,10 +24,13 @@ const (
 	EmptyString = ""
 )
 
+var version = "test-version"
+
 func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int {
 	var (
 		algo   string
 		help   bool
+		ver    bool
 		hasher hash.Hash
 	)
 
@@ -39,6 +42,9 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 	f.BoolVar(&help, "h", false, "Print help")
 	f.BoolVar(&help, "help", false, "Print help")
 
+	f.BoolVar(&ver, "v", false, " Print version")
+	f.BoolVar(&ver, "version", false, " Print version")
+
 	f.Usage = func() {
 		fmt.Fprintf(stdErr, `%s program usage:
 
@@ -49,6 +55,7 @@ hash [FLAGS] -a SHA1 [FILE]
 Flags:
 -a, -algorithm one of {MD5 SHA1 SHA224 SHA256 SHA384 SHA512}
 -h, -help print help
+-v, -version current version
 `, f.Name())
 	}
 
@@ -58,6 +65,11 @@ Flags:
 	if help {
 		f.Usage()
 		return 2
+	}
+
+	if ver {
+		fmt.Fprintf(stdOut, "%s\n", version)
+		return 0
 	}
 
 	switch strings.ToUpper(algo) {
