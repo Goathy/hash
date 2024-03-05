@@ -94,6 +94,7 @@ func getHashingAlgorithm(algo string) (hasher hash.Hash, err error) {
 func usage(name string, stdErr io.Writer) {
 	fmt.Fprintf(stdErr, `%s program usage:
 
+hash [FLAGS] -a SHA1 [STDIN]
 hash [FLAGS] -a SHA1 -- [STDIN]
 hash [FLAGS] -a SHA1 [FILE]
 

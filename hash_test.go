@@ -32,6 +32,7 @@ func TestHash(t *testing.T) {
 	t.Run("help", func(t *testing.T) {
 		helpMsg := `hash program usage:
 
+hash [FLAGS] -a SHA1 [STDIN]
 hash [FLAGS] -a SHA1 -- [STDIN]
 hash [FLAGS] -a SHA1 [FILE]
 
