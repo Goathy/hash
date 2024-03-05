@@ -115,7 +115,7 @@ Flags:
 
 		t.Run("-algorithm SHA1", func(t *testing.T) {
 			var (
-				args = []string{"hash", "-algorithm", "sha1"}
+				args = []string{"hash", "-algorithm", "sha1", "--"}
 				in   = bytes.NewReader([]byte("Hello World"))
 				out  = new(bytes.Buffer)
 				err  = new(bytes.Buffer)
@@ -161,7 +161,7 @@ Flags:
 
 		t.Run("-a SHA256", func(t *testing.T) {
 			var (
-				args = []string{"hash", "-a", "sha256"}
+				args = []string{"hash", "-a", "sha256", "--"}
 				in   = bytes.NewReader([]byte("Hello World"))
 				out  = new(bytes.Buffer)
 				err  = new(bytes.Buffer)

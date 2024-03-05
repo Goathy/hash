@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
@@ -21,9 +22,8 @@ func main() {
 
 func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int {
 	var (
-		algo   string
-		help   bool
-		hasher hash.Hash
+		algo string
+		help bool
 	)
 
 	f := flag.NewFlagSet("hash", flag.ExitOnError)
@@ -46,11 +46,31 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 		return 2
 	}
 
-	if algo != "" {
-		algo = strings.ToUpper(algo)
+	hasher, err := getHashingAlgorithm(algo)
+
+	if err != nil {
+		fmt.Fprintln(stdErr, err)
+		return 1
 	}
 
-	switch algo {
+	if file := f.Arg(0); file != "" && file != "--" {
+		stdIn = bytes.NewReader(nil)
+		panic("Unsupported functionality")
+	}
+
+	if _, err := io.Copy(hasher, stdIn); err != nil {
+		fmt.Fprintln(stdErr, err)
+		return 1
+	}
+
+	sum := hex.EncodeToString(hasher.Sum(nil))
+	fmt.Fprintln(stdOut, sum)
+
+	return 0
+}
+
+func getHashingAlgorithm(algo string) (hasher hash.Hash, err error) {
+	switch strings.ToUpper(algo) {
 	case "MD5":
 		hasher = md5.New()
 	case "SHA1":
@@ -64,18 +84,11 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 	case "SHA512":
 		hasher = sha512.New()
 	default:
-		fmt.Fprintf(stdErr, "Unsupported hashing algorithm\n")
-		return 1
+		hasher = nil
+		err = fmt.Errorf("Unsupported hashing algorithm")
 	}
 
-	if _, err := io.Copy(hasher, stdIn); err != nil {
-		fmt.Fprint(stdErr, err)
-		return 1
-	}
-	sum := hex.EncodeToString(hasher.Sum(nil))
-	fmt.Fprintln(stdOut, sum)
-
-	return 0
+	return
 }
 
 func usage(name string, stdErr io.Writer) {
