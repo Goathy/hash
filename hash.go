@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -13,7 +14,12 @@ func main() {
 }
 
 var availableAlgorthms = map[string]bool{
-	"md5": true,
+	"MD5":    true,
+	"SHA1":   true,
+	"SHA224": true,
+	"SHA256": true,
+	"SHA384": true,
+	"SHA512": true,
 }
 
 func run(args []string, in io.Reader, out io.Writer, stdErr io.Writer) int {
@@ -40,6 +46,10 @@ func run(args []string, in io.Reader, out io.Writer, stdErr io.Writer) int {
 	if help {
 		f.Usage()
 		return 2
+	}
+
+	if algo != "" {
+		algo = strings.ToUpper(algo)
 	}
 
 	if _, exists := availableAlgorthms[algo]; exists == false {
