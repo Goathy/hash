@@ -108,6 +108,5 @@ hash [FLAGS] -a SHA1 [FILE]
 Flags:
 -a, -algorithm one of {MD5 SHA1 SHA224 SHA256 SHA384 SHA512}
 -h, -help print help
--v, -version print commit hash from which that program was built from
 `, name)
 }
