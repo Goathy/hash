@@ -72,6 +72,11 @@ Flags:
 		return 0
 	}
 
+	if algo == "" {
+		f.Usage()
+		return 2
+	}
+
 	switch strings.ToUpper(algo) {
 	case "MD5":
 		hasher = md5.New()

@@ -62,6 +62,22 @@ Flags:
 			assertEqual(t, out.String(), "")
 			assertEqual(t, err.String(), helpMsg)
 		})
+
+		t.Run("incomplite flag", func(t *testing.T) {
+			var (
+				args = []string{"hash", "-"}
+				in   = bytes.NewReader([]byte(""))
+				out  = new(bytes.Buffer)
+				err  = new(bytes.Buffer)
+			)
+
+			exitCode := run(args, in, out, err)
+
+			assertEqual(t, exitCode, 2)
+			assertEqual(t, out.String(), "")
+			assertEqual(t, err.String(), helpMsg)
+		})
+
 	})
 
 	t.Run("hashing from stdin", func(t *testing.T) {
