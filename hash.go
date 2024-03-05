@@ -1,6 +1,11 @@
 package main
 
 import (
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"io"
@@ -22,7 +27,7 @@ var availableAlgorthms = map[string]bool{
 	"SHA512": true,
 }
 
-func run(args []string, in io.Reader, out io.Writer, stdErr io.Writer) int {
+func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int {
 	var (
 		algo string
 		help bool
@@ -57,6 +62,63 @@ func run(args []string, in io.Reader, out io.Writer, stdErr io.Writer) int {
 		return 1
 	}
 
+	switch algo {
+	case "MD5":
+		hasher := md5.New()
+		if _, err := io.Copy(hasher, stdIn); err != nil {
+			fmt.Fprint(stdErr, err)
+			return 1
+		}
+		sum := hex.EncodeToString(hasher.Sum(nil))
+		fmt.Fprintln(stdOut, sum)
+	case "SHA1":
+		hasher := sha1.New()
+		if _, err := io.Copy(hasher, stdIn); err != nil {
+			fmt.Fprint(stdErr, err)
+			return 1
+		}
+		sum := hex.EncodeToString(hasher.Sum(nil))
+		fmt.Fprintln(stdOut, sum)
+
+	case "SHA224":
+		hasher := sha256.New224()
+		if _, err := io.Copy(hasher, stdIn); err != nil {
+			fmt.Fprint(stdErr, err)
+			return 1
+		}
+		sum := hex.EncodeToString(hasher.Sum(nil))
+		fmt.Fprintln(stdOut, sum)
+
+	case "SHA256":
+		hasher := sha256.New()
+		if _, err := io.Copy(hasher, stdIn); err != nil {
+			fmt.Fprint(stdErr, err)
+			return 1
+		}
+		sum := hex.EncodeToString(hasher.Sum(nil))
+		fmt.Fprintln(stdOut, sum)
+
+	case "SHA384":
+		hasher := sha512.New384()
+		if _, err := io.Copy(hasher, stdIn); err != nil {
+			fmt.Fprint(stdErr, err)
+			return 1
+		}
+		sum := hex.EncodeToString(hasher.Sum(nil))
+		fmt.Fprintln(stdOut, sum)
+
+	case "SHA512":
+		hasher := sha512.New()
+		if _, err := io.Copy(hasher, stdIn); err != nil {
+			fmt.Fprint(stdErr, err)
+			return 1
+		}
+		sum := hex.EncodeToString(hasher.Sum(nil))
+		fmt.Fprintln(stdOut, sum)
+	default:
+		return 3
+
+	}
 	return 0
 }
 
