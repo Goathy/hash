@@ -260,7 +260,7 @@ Flags:
 			exitCode := run(args, in, out, err)
 
 			assertEqual(t, exitCode, 0)
-			assertEqual(t, out.String(), "test-version\n")
+			assertEqual(t, out.String(), "hash version: test-version\n")
 			assertEqual(t, err.String(), "")
 		})
 
@@ -275,7 +275,7 @@ Flags:
 			exitCode := run(args, in, out, err)
 
 			assertEqual(t, exitCode, 0)
-			assertEqual(t, out.String(), "test-version\n")
+			assertEqual(t, out.String(), "hash version: test-version\n")
 			assertEqual(t, err.String(), "")
 		})
 	})

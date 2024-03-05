@@ -68,7 +68,7 @@ Flags:
 	}
 
 	if ver {
-		fmt.Fprintf(stdOut, "%s\n", version)
+		fmt.Fprintf(stdOut, "%s version: %s\n", f.Name(), version)
 		return 0
 	}
 
