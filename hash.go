@@ -21,8 +21,9 @@ func main() {
 
 func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int {
 	var (
-		algo string
-		help bool
+		algo   string
+		help   bool
+		hasher hash.Hash
 	)
 
 	f := flag.NewFlagSet("hash", flag.ExitOnError)
@@ -34,7 +35,16 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 	f.BoolVar(&help, "help", false, "Print help")
 
 	f.Usage = func() {
-		usage(f.Name(), stdErr)
+		fmt.Fprintf(stdErr, `%s program usage:
+
+hash [FLAGS] -a SHA1 [STDIN]
+hash [FLAGS] -a SHA1 -- [STDIN]
+hash [FLAGS] -a SHA1 [FILE]
+
+Flags:
+-a, -algorithm one of {MD5 SHA1 SHA224 SHA256 SHA384 SHA512}
+-h, -help print help
+`, f.Name())
 	}
 
 	f.SetOutput(stdErr)
@@ -45,10 +55,21 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 		return 2
 	}
 
-	hasher, err := getHashingAlgorithm(algo)
-
-	if err != nil {
-		fmt.Fprintln(stdErr, err)
+	switch strings.ToUpper(algo) {
+	case "MD5":
+		hasher = md5.New()
+	case "SHA1":
+		hasher = sha1.New()
+	case "SHA224":
+		hasher = sha256.New224()
+	case "SHA256":
+		hasher = sha256.New()
+	case "SHA384":
+		hasher = sha512.New384()
+	case "SHA512":
+		hasher = sha512.New()
+	default:
+		fmt.Fprintln(stdErr, "Unsupported hashing algorithm")
 		return 1
 	}
 
@@ -74,39 +95,4 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 	fmt.Fprintln(stdOut, sum)
 
 	return 0
-}
-
-func getHashingAlgorithm(algo string) (hasher hash.Hash, err error) {
-	switch strings.ToUpper(algo) {
-	case "MD5":
-		hasher = md5.New()
-	case "SHA1":
-		hasher = sha1.New()
-	case "SHA224":
-		hasher = sha256.New224()
-	case "SHA256":
-		hasher = sha256.New()
-	case "SHA384":
-		hasher = sha512.New384()
-	case "SHA512":
-		hasher = sha512.New()
-	default:
-		hasher = nil
-		err = fmt.Errorf("Unsupported hashing algorithm")
-	}
-
-	return
-}
-
-func usage(name string, stdErr io.Writer) {
-	fmt.Fprintf(stdErr, `%s program usage:
-
-hash [FLAGS] -a SHA1 [STDIN]
-hash [FLAGS] -a SHA1 -- [STDIN]
-hash [FLAGS] -a SHA1 [FILE]
-
-Flags:
--a, -algorithm one of {MD5 SHA1 SHA224 SHA256 SHA384 SHA512}
--h, -help print help
-`, name)
 }
