@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
@@ -53,9 +52,17 @@ func run(args []string, stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) int
 		return 1
 	}
 
-	if file := f.Arg(0); file != "" && file != "--" {
-		stdIn = bytes.NewReader(nil)
-		panic("Unsupported functionality")
+	if filePath := f.Arg(0); filePath != "" && filePath != "--" {
+		file, err := os.Open(filePath)
+
+		if err != nil {
+			fmt.Fprint(stdErr, err)
+			return 1
+		}
+
+		defer file.Close()
+
+		stdIn = file
 	}
 
 	if _, err := io.Copy(hasher, stdIn); err != nil {
